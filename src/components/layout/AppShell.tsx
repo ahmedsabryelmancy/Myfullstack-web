@@ -4,6 +4,7 @@ import { CartProvider } from "../../context/CartContext";
 import { WishlistProvider } from "../../context/WishlistContext";
 import { catalogCategoryLinks } from "../../data/site";
 import { Header } from "./Header";
+import { Footer } from "./Footer";
 
 export function AppShell() {
   return (
@@ -14,6 +15,7 @@ export function AppShell() {
           <main>
             <Outlet />
           </main>
+          <Footer />
         </CartProvider>
       </WishlistProvider>
     </AuthProvider>

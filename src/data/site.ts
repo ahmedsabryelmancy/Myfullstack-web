@@ -15,6 +15,45 @@ export type CategoryNavItem = {
   featuredOnly?: boolean;
 };
 
+export type BlogPost = {
+  id: number;
+  title: string;
+  excerpt: string;
+  date: string;
+  image: string;
+  category: string;
+};
+
+export const blogPosts: BlogPost[] = [
+  {
+    id: 1,
+    title: "Top 5 Smartphones for 2024",
+    excerpt:
+      "Discover the best mobile devices with cutting-edge cameras and battery life.",
+    date: "March 15, 2024",
+    image: "/img/banner_home1.png",
+    category: "Mobiles",
+  },
+  {
+    id: 2,
+    title: "Optimizing Your Home Office Setup",
+    excerpt:
+      "Learn how to choose the right monitor and desk for maximum productivity.",
+    date: "March 12, 2024",
+    image: "/img/banner_home2.png",
+    category: "Engineering",
+  },
+  {
+    id: 3,
+    title: "Smart Appliances: Are They Worth It?",
+    excerpt:
+      "We review the latest smart washing machines and kitchen tech for your home.",
+    date: "March 10, 2024",
+    image: "/img/banner_home3.png",
+    category: "Appliances",
+  },
+];
+
 export const siteCategories = [
   "All categories",
   "Engineering",
@@ -31,55 +70,71 @@ export const catalogCategoryLinks: CategoryNavItem[] = [
   {
     label: "All categories",
     path: "/collections/all-categories",
-    description: "Browse the full catalog across electronics, mobiles, appliances, and future categories.",
-    productCategories: ["electronics", "mobiles", "appliances", "fashion", "jewelry", "toys"],
+    description:
+      "Browse the full catalog across electronics, mobiles, appliances, and future categories.",
+    productCategories: [
+      "electronics",
+      "mobiles",
+      "appliances",
+      "fashion",
+      "jewelry",
+      "toys",
+    ],
   },
   {
     label: "Engineering",
     path: "/collections/engineering",
-    description: "Technical devices, performance-focused hardware, and work-ready electronics.",
+    description:
+      "Technical devices, performance-focused hardware, and work-ready electronics.",
     productCategories: ["electronics"],
   },
   {
     label: "Electronic & digital",
     path: "/collections/electronics",
-    description: "Monitors, TVs, projectors, cameras, and essential digital gear.",
+    description:
+      "Monitors, TVs, projectors, cameras, and essential digital gear.",
     productCategories: ["electronics"],
   },
   {
     label: "Phones & tablets",
     path: "/collections/phones-tablets",
-    description: "Smartphones and portable devices with strong daily performance.",
+    description:
+      "Smartphones and portable devices with strong daily performance.",
     productCategories: ["mobiles"],
   },
   {
     label: "Fashion & clothes",
     path: "/collections/fashion-clothes",
-    description: "This collection page is ready for apparel inventory when added.",
+    description:
+      "This collection page is ready for apparel inventory when added.",
     productCategories: ["fashion"],
   },
   {
     label: "Televisions & monitor",
     path: "/collections/televisions-monitor",
-    description: "Displays and home entertainment screens curated for larger setups.",
+    description:
+      "Displays and home entertainment screens curated for larger setups.",
     productCategories: ["electronics"],
   },
   {
     label: "Jewelry & watches",
     path: "/collections/jewelry-watches",
-    description: "This collection page is ready for accessories and watch inventory.",
+    description:
+      "This collection page is ready for accessories and watch inventory.",
     productCategories: ["jewelry"],
   },
   {
     label: "Washing & machine",
     path: "/collections/washing-machine",
-    description: "Home appliances, washers, kitchen machines, and practical household equipment.",
+    description:
+      "Home appliances, washers, kitchen machines, and practical household equipment.",
     productCategories: ["appliances"],
   },
   {
     label: "Toys & hobbies",
     path: "/collections/toys-hobbies",
-    description: "This collection page is ready for hobby and toy catalog expansion.",
+    description:
+      "This collection page is ready for hobby and toy catalog expansion.",
     productCategories: ["toys"],
   },
 ];
@@ -164,15 +219,15 @@ export const navLinks: NavItem[] = [
 ];
 
 export const navPageByPath = Object.fromEntries(
-  navLinks.map((item) => [item.path, item])
+  navLinks.map((item) => [item.path, item]),
 ) as Record<string, NavItem>;
 
 export const categoryPageByPath = Object.fromEntries(
-  headerCategoryLinks.map((item) => [item.path, item])
+  headerCategoryLinks.map((item) => [item.path, item]),
 ) as Record<string, CategoryNavItem>;
 
 const searchCategoryMap: Record<string, string[]> = Object.fromEntries(
-  catalogCategoryLinks.map((item) => [item.label, item.productCategories])
+  catalogCategoryLinks.map((item) => [item.label, item.productCategories]),
 );
 
 export function getMappedProductCategories(searchCategory: string) {
@@ -180,13 +235,13 @@ export function getMappedProductCategories(searchCategory: string) {
 }
 
 export function getCategoryRouteByLabel(searchCategory: string) {
-  return catalogCategoryLinks.find((item) => item.label === searchCategory)?.path ?? null;
+  return (
+    catalogCategoryLinks.find((item) => item.label === searchCategory)?.path ??
+    null
+  );
 }
 
-export const heroSlides = [
-  "/img/banner_home1.png",
-  "/img/banner_home2.png",
-];
+export const heroSlides = ["/img/banner_home1.png", "/img/banner_home2.png"];
 
 export const featureBanners = [
   "/img/banner3_1.png",

@@ -17,7 +17,8 @@ export function Footer() {
             </p>
 
             <div className="site_footer_contact">
-              <a href="tel:+201001234567">+20 100 2222</a>
+              <a href="tel:+201223835394">+201223835394</a>
+              <a href="tel:+201044538772">+201044538772</a>
               <a href="mailto:support@ahmedstore.com">support@ahmedstore.com</a>
             </div>
           </div>
