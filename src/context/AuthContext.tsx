@@ -1,12 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { api, tokenStorage } from "../lib/api";
 
-type StoredUser = {
-  name: string;
-  email: string;
-  password: string;
-};
-
-type AuthUser = {
+// ── Types ─────────────────────────────────────────────────
+export type AuthUser = {
   name: string;
   email: string;
 };
@@ -20,125 +16,124 @@ type SignupPayload = AuthCredentials & {
   name: string;
 };
 
+type AuthResult = {
+  success: boolean;
+  message: string;
+};
+
 type AuthContextValue = {
   user: AuthUser | null;
-  login: (credentials: AuthCredentials) => { success: boolean; message: string };
-  signup: (payload: SignupPayload) => { success: boolean; message: string };
+  isAuthLoading: boolean;
+  login: (credentials: AuthCredentials) => Promise<AuthResult>;
+  signup: (payload: SignupPayload) => Promise<AuthResult>;
   logout: () => void;
 };
 
-const USERS_STORAGE_KEY = "ahmed-store-users";
-const CURRENT_USER_STORAGE_KEY = "ahmed-store-current-user";
+// ── Backend response shapes ───────────────────────────────
+type AuthApiResponse = {
+  success: boolean;
+  token: string;
+  user: AuthUser;
+  message?: string;
+};
 
+type MeApiResponse = {
+  success: boolean;
+  user: AuthUser;
+};
+
+// ── Context ───────────────────────────────────────────────
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-function toAuthUser(user: StoredUser): AuthUser {
-  return {
-    name: user.name,
-    email: user.email,
-  };
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
+  // Restore session on mount
   useEffect(() => {
-    const storedUser = window.localStorage.getItem(CURRENT_USER_STORAGE_KEY);
-    if (!storedUser) {
+    const token = tokenStorage.get();
+    if (!token) {
+      setIsAuthLoading(false);
       return;
     }
 
-    try {
-      setUser(JSON.parse(storedUser) as AuthUser);
-    } catch {
-      window.localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
-    }
+    api
+      .get<MeApiResponse>("/api/auth/me")
+      .then((data) => {
+        if (data.success) {
+          setUser(data.user);
+        } else {
+          tokenStorage.clear();
+        }
+      })
+      .catch(() => {
+        tokenStorage.clear();
+      })
+      .finally(() => {
+        setIsAuthLoading(false);
+      });
   }, []);
 
-  const login = ({ email, password }: AuthCredentials) => {
-    const users = readStoredUsers();
-    const matchedUser = users.find(
-      (storedUser) => storedUser.email.toLowerCase() === email.toLowerCase() && storedUser.password === password
-    );
+  // Clear user if any API call returns 401 (token expired)
+  useEffect(() => {
+    const handleExpired = () => setUser(null);
+    window.addEventListener("auth:expired", handleExpired);
+    return () => window.removeEventListener("auth:expired", handleExpired);
+  }, []);
 
-    if (!matchedUser) {
+  const login = async ({ email, password }: AuthCredentials): Promise<AuthResult> => {
+    try {
+      const data = await api.post<AuthApiResponse>("/api/auth/login", {
+        email,
+        password,
+      });
+      tokenStorage.set(data.token);
+      setUser(data.user);
+      return { success: true, message: "Login successful." };
+    } catch (err) {
       return {
         success: false,
-        message: "Invalid email or password.",
+        message: err instanceof Error ? err.message : "Login failed.",
       };
     }
-
-    const nextUser = toAuthUser(matchedUser);
-    setUser(nextUser);
-    window.localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(nextUser));
-
-    return {
-      success: true,
-      message: "Login successful.",
-    };
   };
 
-  const signup = ({ name, email, password }: SignupPayload) => {
-    const users = readStoredUsers();
-    const userExists = users.some(
-      (storedUser) => storedUser.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (userExists) {
+  const signup = async ({
+    name,
+    email,
+    password,
+  }: SignupPayload): Promise<AuthResult> => {
+    try {
+      const data = await api.post<AuthApiResponse>("/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+      tokenStorage.set(data.token);
+      setUser(data.user);
+      return { success: true, message: "Account created successfully." };
+    } catch (err) {
       return {
         success: false,
-        message: "An account with this email already exists.",
+        message: err instanceof Error ? err.message : "Signup failed.",
       };
     }
-
-    const newUser: StoredUser = {
-      name,
-      email,
-      password,
-    };
-
-    const nextUsers = [...users, newUser];
-    window.localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(nextUsers));
-
-    const nextUser = toAuthUser(newUser);
-    setUser(nextUser);
-    window.localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(nextUser));
-
-    return {
-      success: true,
-      message: "Account created successfully.",
-    };
   };
 
   const logout = () => {
+    tokenStorage.clear();
     setUser(null);
-    window.localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
   };
 
-  return <AuthContext.Provider value={{ user, login, signup, logout }}>{children}</AuthContext.Provider>;
-}
-
-function readStoredUsers(): StoredUser[] {
-  const storedUsers = window.localStorage.getItem(USERS_STORAGE_KEY);
-
-  if (!storedUsers) {
-    return [];
-  }
-
-  try {
-    return JSON.parse(storedUsers) as StoredUser[];
-  } catch {
-    window.localStorage.removeItem(USERS_STORAGE_KEY);
-    return [];
-  }
+  return (
+    <AuthContext.Provider value={{ user, isAuthLoading, login, signup, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }

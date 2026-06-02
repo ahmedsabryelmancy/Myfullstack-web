@@ -5,6 +5,7 @@ import { WishlistProvider } from "../../context/WishlistContext";
 import { catalogCategoryLinks } from "../../data/site";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { MobileBottomNav } from "./MobileBottomNav";
 
 export function AppShell() {
   return (
@@ -16,6 +17,7 @@ export function AppShell() {
             <Outlet />
           </main>
           <Footer />
+          <MobileBottomNav />
         </CartProvider>
       </WishlistProvider>
     </AuthProvider>

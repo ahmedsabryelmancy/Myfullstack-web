@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { Product } from "../../../types/product";
+import { api } from "../../../lib/api";
 
 type ProductsState = {
   products: Product[];
   loading: boolean;
   error: string | null;
+};
+
+type ProductsApiResponse = {
+  success: boolean;
+  products: Product[];
+  total: number;
 };
 
 export function useProducts(): ProductsState {
@@ -15,29 +22,21 @@ export function useProducts(): ProductsState {
   useEffect(() => {
     let isActive = true;
 
-    const loadProducts = async () => {
-      try {
-    const response = await fetch("/products.json");
-        if (!response.ok) {
-          throw new Error("Failed to load products.");
+    api
+      .get<ProductsApiResponse>("/api/products?limit=100")
+      .then((data) => {
+        if (isActive && data.success) {
+          setProducts(data.products);
         }
-
-        const data = (await response.json()) as Product[];
+      })
+      .catch((err: unknown) => {
         if (isActive) {
-          setProducts(data);
+          setError(err instanceof Error ? err.message : "Failed to load products.");
         }
-      } catch (err) {
-        if (isActive) {
-          setError(err instanceof Error ? err.message : "Unknown error");
-        }
-      } finally {
-        if (isActive) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadProducts();
+      })
+      .finally(() => {
+        if (isActive) setLoading(false);
+      });
 
     return () => {
       isActive = false;

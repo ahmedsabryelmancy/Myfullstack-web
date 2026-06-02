@@ -175,74 +175,260 @@ main {
   }
 }
 
+/* Mobile hamburger button: hidden by default on desktop */
+.mobile_menu_btn {
+  display: none;
+}
+
+/* ── MOBILE BOTTOM NAV BAR ───────────────────────── */
+.mobile_bottom_nav {
+  display: none; /* hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .mobile_bottom_nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    height: 60px;
+    background: #fff;
+    border-top: 1px solid var(--border_color);
+    box-shadow: 0 -4px 20px rgba(18, 20, 22, 0.08);
+  }
+
+  .mobile_bottom_nav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--p_color);
+    font-size: 10px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 6px 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile_bottom_nav a i {
+    font-size: 20px;
+    color: inherit;
+  }
+
+  .mobile_bottom_nav a span {
+    color: inherit;
+    font-size: 10px;
+  }
+
+  .mobile_bottom_nav a.active,
+  .mobile_bottom_nav a:active {
+    color: var(--main_color);
+  }
+
+  .mobile_bottom_nav_badge_wrap {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .mobile_bottom_nav_badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--main_color);
+    color: #fff !important;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+  }
+}
+
 @media (max-width: 768px) {
   body {
-    padding-top: 210px;
+    padding-top: 156px;
+    padding-bottom: 68px; /* room for mobile bottom nav bar */
   }
 
-  .btns,
-  header .bottom_header .container,
-  header .bottom_header nav,
-  header .bottom_header .nav_links,
-  .slider .container,
-  .banners_4 .container,
-  .banners .banners_boxs,
-  .product .icons {
-    flex-direction: column;
-  }
-
+  /* ── TOP HEADER ─────────────────────────────────── */
   header .top_header .container {
-    align-items: stretch;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 0;
+    gap: 10px;
   }
 
+  header .top_header .logo {
+    width: 110px;
+  }
+
+  header .top_header .header_icons {
+    margin-left: auto;
+    gap: 20px;
+  }
+
+  /* Search box: full-width second row */
   header .top_header .container .search_box {
-    display: grid;
-    grid-template-columns: 1fr;
+    order: 3;
     width: 100%;
+    height: 46px;
   }
 
-  .search_suggestions {
-    position: static;
-    margin-top: 8px;
-    border-radius: 16px;
-    box-shadow: none;
+  header .top_header .container .search_box .select_box {
+    display: none;
   }
 
   header .top_header .container .search_box .select_box::after {
     display: none;
   }
 
-  header .top_header .container .search_box select,
-  header .top_header .container .search_box input,
-  header .top_header .search_box button {
-    width: 100%;
+  header .top_header .container .search_box input {
+    flex: 1;
+    width: 0; /* flex will size it */
+    height: 46px;
   }
 
-  header .bottom_header nav,
-  header .bottom_header .container,
-  header .bottom_header .nav_links {
+  header .top_header .search_box button {
+    height: 46px;
+    width: 46px;
+    flex-shrink: 0;
+  }
+
+  .search_suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  /* ── BOTTOM HEADER ───────────────────────────────── */
+  header .bottom_header .container {
+    flex-direction: column;
     align-items: stretch;
+    padding: 0;
+  }
+
+  /* Mobile hamburger toggle – visible only on mobile */
+  .mobile_menu_btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--main_color);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .mobile_menu_btn i {
+    color: #fff;
+    font-size: 16px;
   }
 
   header .bottom_header nav {
     width: 100%;
     height: auto;
+    flex-direction: column;
+    gap: 0;
+    align-items: stretch;
   }
 
+  /* Category dropdown hidden on mobile (browsing via nav links or collections) */
   header .bottom_header .category_nav {
-    width: 100%;
-    min-height: 60px;
+    display: none;
   }
 
+  /* Nav links hidden by default; revealed by .mobile_nav_open */
+  header .bottom_header .nav_links {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    background: #fff;
+    border-top: 1px solid var(--border_color);
+  }
+
+  header .bottom_header .nav_links.mobile_nav_open {
+    display: flex;
+  }
+
+  header .bottom_header .nav_links li a {
+    display: block;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border_color);
+    font-size: 15px;
+  }
+
+  header .bottom_header .nav_links li:last-child a {
+    border-bottom: none;
+  }
+
+  /* Auth buttons hidden by default; revealed by .mobile_nav_open */
+  .login_signup.btns {
+    display: none !important;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f9f9f9;
+    border-top: 1px solid var(--border_color);
+  }
+
+  .login_signup.btns.mobile_nav_open {
+    display: flex !important;
+  }
+
+  .login_signup.btns .btn,
+  .login_signup.btns .auth_logout_btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .login_signup.btns .auth_user_chip {
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* ── PRODUCT CARDS ───────────────────────────────── */
+  .product .icons {
+    flex-wrap: wrap;
+  }
+
+  .product .icons .btn_add_cart {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .product .icons .icon_product {
+    flex-shrink: 0;
+  }
+
+  /* ── SWIPER NAV ARROWS ───────────────────────────── */
   .slide .container .myswiper .btn_swip,
   .slide_product .swiper-button-next,
   .slide_product .swiper-button-prev {
     display: none;
   }
+}
 
-  .product .icons .btn_add_cart,
-  .product .icons .icon_product {
-    justify-content: center;
-    width: 100%;
+@media (max-width: 480px) {
+  body {
+    padding-top: 146px;
+  }
+
+  header .top_header .logo {
+    width: 90px;
   }
 }

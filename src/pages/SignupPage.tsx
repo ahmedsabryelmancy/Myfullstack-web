@@ -12,12 +12,13 @@ export function SignupPage() {
     confirmPassword: "",
   });
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; message: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (user) {
     return <Navigate to="/" replace />;
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (formState.password !== formState.confirmPassword) {
@@ -30,7 +31,10 @@ export function SignupPage() {
       return;
     }
 
-    const result = signup({
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    const result = await signup({
       name: formState.name,
       email: formState.email,
       password: formState.password,
@@ -40,6 +44,8 @@ export function SignupPage() {
 
     if (result.success) {
       navigate("/");
+    } else {
+      setIsSubmitting(false);
     }
   };
 
@@ -135,8 +141,8 @@ export function SignupPage() {
                 <p className={`auth_feedback auth_feedback_${feedback.type}`}>{feedback.message}</p>
               ) : null}
 
-              <button type="submit" className="btn auth_submit_button">
-                Sign up <i className="fa-solid fa-user-plus" />
+              <button type="submit" className="btn auth_submit_button" disabled={isSubmitting}>
+                {isSubmitting ? "Creating account…" : <>Sign up <i className="fa-solid fa-user-plus" /></>}
               </button>
             </form>
 

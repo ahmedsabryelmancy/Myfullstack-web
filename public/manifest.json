@@ -1,0 +1,26 @@
+{
+  "name": "Ahmed Store",
+  "short_name": "Ahmed",
+  "description": "Shop curated electronics, mobile devices, and home upgrades.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ff8716",
+  "icons": [
+    {
+      "src": "/img/icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "lang": "en"
+}

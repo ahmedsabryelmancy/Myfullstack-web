@@ -23,6 +23,7 @@ export function Header({ categories }: HeaderProps) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(categories[0]?.label ?? "All categories");
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export function Header({ categories }: HeaderProps) {
 
   useEffect(() => {
     setMenuOpen(false);
+    setMobileNavOpen(false);
   }, [location.pathname]);
 
   const suggestions = useMemo(() => {
@@ -183,6 +185,17 @@ export function Header({ categories }: HeaderProps) {
 
       <div className="bottom_header">
         <div className="container">
+          <button
+            type="button"
+            className="mobile_menu_btn"
+            onClick={() => setMobileNavOpen((open) => !open)}
+            aria-expanded={isMobileNavOpen}
+            aria-label="Toggle navigation menu"
+          >
+            <i className={`fa-solid ${isMobileNavOpen ? "fa-xmark" : "fa-bars"}`} />
+            {isMobileNavOpen ? "Close" : "Menu"}
+          </button>
+
           <nav className="nav" aria-label="Main navigation">
             <div className="category_nav">
               <button
@@ -205,7 +218,7 @@ export function Header({ categories }: HeaderProps) {
               </div>
             </div>
 
-            <ul className="nav_links">
+            <ul className={`nav_links ${isMobileNavOpen ? "mobile_nav_open" : ""}`}>
               {navLinks.map((item) => (
                 <li key={item.path}>
                   <NavLink
@@ -220,7 +233,7 @@ export function Header({ categories }: HeaderProps) {
             </ul>
           </nav>
 
-          <div className="login_signup btns">
+          <div className={`login_signup btns ${isMobileNavOpen ? "mobile_nav_open" : ""}`}>
             {user ? (
               <>
                 <div className="auth_user_chip" aria-label="Signed in user">

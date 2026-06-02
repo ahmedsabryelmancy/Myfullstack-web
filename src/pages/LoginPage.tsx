@@ -7,19 +7,24 @@ export function LoginPage() {
   const { login, user } = useAuth();
   const [formState, setFormState] = useState({ email: "", password: "" });
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; message: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (user) {
     return <Navigate to="/" replace />;
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
+    setFeedback(null);
 
-    const result = login(formState);
+    const result = await login(formState);
     setFeedback({ type: result.success ? "success" : "error", message: result.message });
 
     if (result.success) {
       navigate("/");
+    } else {
+      setIsSubmitting(false);
     }
   };
 
@@ -89,8 +94,8 @@ export function LoginPage() {
                 <p className={`auth_feedback auth_feedback_${feedback.type}`}>{feedback.message}</p>
               ) : null}
 
-              <button type="submit" className="btn auth_submit_button">
-                Login <i className="fa-solid fa-right-to-bracket" />
+              <button type="submit" className="btn auth_submit_button" disabled={isSubmitting}>
+                {isSubmitting ? "Signing in…" : <>Login <i className="fa-solid fa-right-to-bracket" /></>}
               </button>
             </form>
 
