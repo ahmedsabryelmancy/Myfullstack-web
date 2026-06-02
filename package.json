@@ -2,7 +2,7 @@
   "name": "ecommerce-fullstack",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd My-fullstack-app/frontend && npm install && npm run build && cd ../backend && npm install",
+    "build": "npm install --prefix My-fullstack-app/frontend && npm run --prefix My-fullstack-app/frontend build && npm install --prefix My-fullstack-app/backend",
     "start": "node My-fullstack-app/backend/server.js"
   }
 }
