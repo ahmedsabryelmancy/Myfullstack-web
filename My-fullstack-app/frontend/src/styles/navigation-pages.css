@@ -1,0 +1,123 @@
+.content_page,
+.collection_page {
+  padding: 48px 0 80px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 135, 22, 0.12), transparent 28%),
+    linear-gradient(180deg, #fff9f4 0%, #ffffff 42%, #fff5ea 100%);
+}
+
+.content_page_hero,
+.collection_page_hero,
+.collection_empty_state {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(229, 229, 229, 0.92);
+  border-radius: 30px;
+  box-shadow: 0 24px 80px rgba(18, 20, 22, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.content_page_hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 24px;
+  padding: 34px;
+}
+
+.collection_page_hero,
+.collection_empty_state {
+  padding: 30px;
+  margin-bottom: 26px;
+}
+
+.content_page_intro h1,
+.collection_page_hero h1 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.06;
+  margin-bottom: 14px;
+}
+
+.content_page_intro > p:last-of-type,
+.collection_page_hero > p:last-of-type,
+.collection_empty_state p {
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.content_page_actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 24px;
+  align-items: center;
+}
+
+.content_page_text_link {
+  color: var(--main_color);
+  font-weight: 600;
+}
+
+.content_page_panel {
+  padding: 24px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #121416 0%, #1f2529 100%);
+}
+
+.content_page_panel h2 {
+  color: #fff;
+  margin-bottom: 18px;
+}
+
+.content_page_highlights {
+  display: grid;
+  gap: 12px;
+}
+
+.content_page_highlights div {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.content_page_highlights i,
+.content_page_highlights span {
+  color: #fff;
+}
+
+.collection_empty_state {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+header .bottom_header .nav_links li a.active {
+  color: var(--main_color);
+}
+
+@media (max-width: 900px) {
+  .content_page_hero,
+  .products_grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .content_page,
+  .collection_page {
+    padding: 32px 0 56px;
+  }
+
+  .content_page_hero,
+  .collection_page_hero,
+  .collection_empty_state {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .content_page_actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
