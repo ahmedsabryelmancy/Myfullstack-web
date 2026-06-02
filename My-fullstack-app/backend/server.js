@@ -37,17 +37,18 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(frontendPath));
 
     // أي مسار لا يبدأ بـ /api يتم توجيهه إلى index.html الخاص بـ React
-    app.get('*', (req, res) => {
-        if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(frontendPath, 'index.html'));
-        }
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api')) return next();
+        res.sendFile(path.join(frontendPath, 'index.html'));
     });
 }
 
-// التأكد من وجود مجلد uploads
-if (!fs.existsSync('./uploads')) {
-    fs.mkdirSync('./uploads');
-}
+// التأكد من وجود مجلد uploads (لا يعمل على Vercel)
+try {
+    if (!fs.existsSync('./uploads')) {
+        fs.mkdirSync('./uploads');
+    }
+} catch (e) {}
 
 // إعداد Multer لتخزين الملفات
 // سنستخدم MemoryStorage بدلاً من DiskStorage لمعالجتها قبل الحفظ
@@ -75,7 +76,8 @@ const Product = mongoose.model('Product', productSchema);
 
 // تعريف مستخدم (User)
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true }
 });
 const User = mongoose.model('User', userSchema);
@@ -269,33 +271,48 @@ app.post('/api/seed', verifyToken, async (req, res) => {
 
 // مسار تسجيل الدخول (Login)
 app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: "المستخدم غير موجود" });
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ message: "البريد الإلكتروني وكلمة المرور مطلوبان" });
 
-    const validPass = await bcrypt.compare(password, user.password);
-    if (!validPass) return res.status(400).json({ message: "كلمة المرور خاطئة" });
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) return res.status(400).json({ message: "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
 
-    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '2h' });
-    res.json({ token });
+        const validPass = await bcrypt.compare(password, user.password);
+        if (!validPass) return res.status(400).json({ message: "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
+
+        const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
+        res.json({ token, user: { name: user.name, email: user.email } });
+    } catch (err) {
+        res.status(500).json({ error: "حدث خطأ أثناء تسجيل الدخول" });
+    }
 });
 
-// مسار تسجيل مستخدم جديد (Register) - يستخدم مرة واحدة لإنشاء حسابك
+// مسار تسجيل مستخدم جديد (Register)
 app.post('/api/register', async (req, res) => {
     try {
-        const userExists = await User.findOne({ username: req.body.username });
-        if (userExists) return res.status(400).json({ message: "اسم المستخدم موجود بالفعل" });
+        const { name, email, password } = req.body;
+        if (!name || !email || !password) return res.status(400).json({ message: "جميع الحقول مطلوبة" });
+
+        const userExists = await User.findOne({ email: email.toLowerCase() });
+        if (userExists) return res.status(400).json({ message: "هذا البريد الإلكتروني مستخدم بالفعل" });
 
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        const user = new User({ username: req.body.username, password: hashedPassword });
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const user = new User({ name, email: email.toLowerCase(), password: hashedPassword });
         await user.save();
-        res.json({ message: "تم إنشاء حساب المدير بنجاح" });
+
+        const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
+        res.json({ token, user: { name: user.name, email: user.email }, message: "تم إنشاء الحساب بنجاح" });
     } catch (err) {
         res.status(500).json({ error: "حدث خطأ أثناء التسجيل" });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 السيرفر يعمل على المنفذ: ${PORT}`);
-});
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`🚀 السيرفر يعمل على المنفذ: ${PORT}`);
+    });
+}
+
+module.exports = app;
