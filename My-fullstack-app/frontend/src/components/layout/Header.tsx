@@ -23,6 +23,7 @@ export function Header({ categories }: HeaderProps) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(categories[0]?.label ?? "All categories");
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export function Header({ categories }: HeaderProps) {
 
   useEffect(() => {
     setMenuOpen(false);
+    setMobileMenuOpen(false);
   }, [location.pathname]);
 
   const suggestions = useMemo(() => {
@@ -177,11 +179,21 @@ export function Header({ categories }: HeaderProps) {
               <i className="fa-solid fa-cart-arrow-down" />
               <span className="count count_item_header">{cartCount}</span>
             </Link>
+
+            <button
+              type="button"
+              className="mobile_menu_btn"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              aria-label="Toggle mobile menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <i className={isMobileMenuOpen ? "fa-solid fa-xmark" : "fa-solid fa-bars"} />
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="bottom_header">
+      <div className={`bottom_header ${isMobileMenuOpen ? "mobile_open" : ""}`}>
         <div className="container">
           <nav className="nav" aria-label="Main navigation">
             <div className="category_nav">
