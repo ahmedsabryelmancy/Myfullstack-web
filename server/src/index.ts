@@ -1,4 +1,5 @@
 import "dotenv/config";
+import path from "path";
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
@@ -60,10 +61,21 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 
-// ── 404 ───────────────────────────────────────────────────
-app.use((_req, res) => {
+// ── API 404 (unmatched /api/* only) ──────────────────────
+app.use("/api", (_req, res) => {
   res.status(404).json({ success: false, message: "Route not found." });
 });
+
+// ── Serve React build in production (Render unified server) ──
+if (process.env.NODE_ENV === "production") {
+  // __dirname is server/dist in compiled JS, so ../../client/dist = client/dist
+  const clientDist = path.resolve(__dirname, "../../client/dist");
+  app.use(express.static(clientDist));
+  // Catch-all: send index.html so React Router handles the path
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 // ── Local dev server ──────────────────────────────────────
 // Vercel sets VERCEL=1 at runtime, so this block is skipped in production.

@@ -1,4 +1,6 @@
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:5000";
+// In production (Render), frontend and backend share one origin so BASE_URL is "".
+// Locally, VITE_API_URL=http://localhost:5000 in .env.local, or the Vite proxy handles it.
+const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 const TOKEN_KEY = "ahmed-store-token";
 
